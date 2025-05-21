@@ -13,7 +13,9 @@ from langchain_community.chat_message_histories.streamlit import StreamlitChatMe
 import faiss
 import os
 
-load_dotenv()
+#load_dotenv()
+
+os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
 
 @st.cache_resource
 def load_and_split_pdf(file_path):
