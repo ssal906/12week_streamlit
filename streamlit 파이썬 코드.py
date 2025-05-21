@@ -41,7 +41,7 @@ def get_vector_store(_docs):
         return create_vector_store(_docs)
     
 @st.cache_resource
-def initialize_components(selected_model):
+def initialize_components(selected_model, file_path):
     pages = load_and_split_pdf(file_path)
     vectorstore = get_vector_store(pages)
     retriever = vectorstore.as_retriever()
