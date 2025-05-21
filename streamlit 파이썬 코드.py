@@ -97,7 +97,7 @@ def initialize_components(selected_model, file_path):
 
 st.header("헌법 Q&A 챗봇")
 
-uploaded_file = st.file_uploader("헌법 PDF 파일 업로드(pdf이름을 temp로 수정)", type="pdf")
+uploaded_file = st.file_uploader("헌법 PDF 파일 업로드(pdf이름은 영어여야함.)", type="pdf")
 
 if uploaded_file is not None:
     with open("temp.pdf", "wb") as f:
