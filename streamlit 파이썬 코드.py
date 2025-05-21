@@ -42,7 +42,6 @@ def get_vector_store(_docs):
     
 @st.cache_resource
 def initialize_components(selected_model):
-    file_path = "C:/Users/sbin0/Desktop/3-1/인공지능서비스개발/대한민국헌법(헌법)(제00010호)(19880225).pdf"
     pages = load_and_split_pdf(file_path)
     vectorstore = get_vector_store(pages)
     retriever = vectorstore.as_retriever()
@@ -97,36 +96,43 @@ def initialize_components(selected_model):
     return rag_chain
 
 st.header("헌법 Q&A 챗봇")
-option = st.selectbox("Select GPT Model", ("gpt-4o", "gpt-3.5-turbo-0125"))
-rag_chain = initialize_components(option)
-chat_history = StreamlitChatMessageHistory(key="chat_messages")
 
-conversational_rag_chain = RunnableWithMessageHistory(
-    rag_chain,
-    lambda session_id: chat_history,
-    input_messages_key="input",
-    history_messages_key="chat_history",
-    output_messages_key="answer",
-)
+uploaded_file = st.file_uploader("PDF 파일 업로드", type="pdf")
 
-if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role":"assistant", "content":"헌법에 대해 무엇이든 물어보세요!"}]
+if uploaded_file is not None:
+    with open("temp.pdf", "wb") as f:
+        f.write(uploaded_file.read())
+    file_path = "temp.pdf"
 
-for msg in chat_history.messages:
-    st.chat_message(msg.type).write(msg.content)
+    option = st.selectbox("Select GPT Model", ("gpt-4o", "gpt-3.5-turbo-0125"))
+    rag_chain = initialize_components(option, file_path)
+    chat_history = StreamlitChatMessageHistory(key="chat_messages")
 
-if prompt_message := st.chat_input("Your question"):
-    st.chat_message("human").write(prompt_message)
-    with st.chat_message("ai"):
-        with st.spinner("Thinking....."):
-            config = {"configurable":{"session_id":"any"}}
-            response = conversational_rag_chain.invoke(
-                {"input":prompt_message},
-                config
-            )
-            answer = response['answer']
-            st.write(answer)
+    conversational_rag_chain = RunnableWithMessageHistory(
+        rag_chain,
+        lambda session_id: chat_history,
+        input_messages_key="input",
+        history_messages_key="chat_history",
+        output_messages_key="answer",
+    )
 
-            with st.expander("참고 문서 확인"):
-                for doc in response['context']:
-                    st.markdown(doc.metadata['source'], help=doc.page_content)
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = [{"role": "assistant", "content": "헌법에 대해 무엇이든 물어보세요!"}]
+
+    for msg in chat_history.messages:
+        st.chat_message(msg.type).write(msg.content)
+
+    if prompt_message := st.chat_input("Your question"):
+        st.chat_message("human").write(prompt_message)
+        with st.chat_message("ai"):
+            with st.spinner("Thinking....."):
+                config = {"configurable": {"session_id": "any"}}
+                response = conversational_rag_chain.invoke({"input": prompt_message}, config)
+                answer = response['answer']
+                st.write(answer)
+
+                with st.expander("참고 문서 확인"):
+                    for doc in response['context']:
+                        st.markdown(doc.metadata['source'], help=doc.page_content)
+else:
+    st.info("먼저 PDF 파일을 업로드해주세요.")
