@@ -3,6 +3,6 @@ langchain
 langchain-community
 langchain-openai
 langchain-core
-faiss
+faiss-cpu
 langchain-text-splitter
 pypdf
