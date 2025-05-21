@@ -97,12 +97,12 @@ def initialize_components(selected_model, file_path):
 
 st.header("헌법 Q&A 챗봇")
 
-uploaded_file = st.file_uploader("PDF 파일 업로드", type="pdf")
+uploaded_file = st.file_uploader("헌법 PDF 파일 업로드(대한민국헌법(헌법)(제00010호)(19880225))", type="pdf")
 
 if uploaded_file is not None:
-    with open("temp.pdf", "wb") as f:
+    with open("대한민국헌법(헌법)(제00010호)(19880225).pdf", "wb") as f:
         f.write(uploaded_file.read())
-    file_path = "temp.pdf"
+    file_path = "대한민국헌법(헌법)(제00010호)(19880225).pdf"
 
     option = st.selectbox("Select GPT Model", ("gpt-4o", "gpt-3.5-turbo-0125"))
     rag_chain = initialize_components(option, file_path)
